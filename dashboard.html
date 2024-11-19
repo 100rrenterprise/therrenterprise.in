@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RR Enterprise Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+    }
+    
+    .sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #0077b6;
+      color: white;
+      padding-top: 20px;
+      padding-left: 20px;
+    }
+    
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      padding: 15px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+
+    .sidebar ul li:hover {
+      background-color: #005f87;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 30px;
+    }
+
+    .card {
+      margin-bottom: 30px;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 350px;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .box {
+      background-color: #0077b6;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .box:hover {
+      background-color: #005f87;
+    }
+
+    .overview-section, .customer-due-section, .dealer-due-section {
+      margin-bottom: 40px;
+    }
+
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+      }
+
+      .main-content {
+        margin-left: 70px;
+      }
+
+      .sidebar ul li {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>RR Enterprise</h3>
+    <ul>
+      <li onclick="loadDashboard()">📊 Dashboard</li>
+      <li onclick="loadItems()">📦 Items</li>
+      <li onclick="loadSelling()">💵 Selling</li>
+      <li onclick="loadPurchase()">🛒 Purchase</li>
+      <li onclick="loadCustomerLedger()">📘 Customer Ledger</li>
+      <li onclick="loadDealerLedger()">📋 Dealer Ledger</li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1> Overall Overview </h1>
+    <div id="content-area">
+      <!-- Dashboard content will load here dynamically -->
+    </div>
+  </div>
+
+  <!-- Script to load dynamic data and charts -->
+  <script>
+    // Function to load dashboard content
+    function loadDashboard() {
+      const contentArea = document.getElementById('content-area');
+      contentArea.innerHTML = `
+        <h2>Dashboard Overview</h2>
+        <div class="overview-section">
+          <div class="box">Annual Overview: ₹<span id="annual-overview"></span></div>
+          <div class="box">Current Month Overview: ₹<span id="current-month-overview"></span></div>
+        </div>
+
+        <div class="chart-container">
+          <canvas id="annual-overview-chart"></canvas>
+        </div>
+
+        <div class="overview-section">
+          <div class="box">12 Months Overview: ₹<span id="twelve-months-overview"></span></div>
+        </div>
+
+        <div class="customer-due-section">
+          <h2>Customer Outstanding</h2>
+          <div class="box">Outstanding Dues: ₹<span id="customer-outstanding"></span></div>
+        </div>
+
+        <div class="dealer-due-section">
+          <h2>Dealer Payments</h2>
+          <div class="box">Total Payable to Dealers: ₹<span id="dealer-payable"></span></div>
+        </div>
+      `;
+
+      // Fetch API data to populate the fields
+      fetchData();
+    }
+
+    // Fetching data from API (simulated API data for now)
+    function fetchData() {
+      fetch('https://api.example.com/dashboard-data')  // Replace with your actual API endpoint
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('annual-overview').innerText = data.annualOverview;
+          document.getElementById('current-month-overview').innerText = data.currentMonthOverview;
+          document.getElementById('twelve-months-overview').innerText = data.twelveMonthsOverview;
+          document.getElementById('customer-outstanding').innerText = data.customerOutstanding;
+          document.getElementById('dealer-payable').innerText = data.dealerPayable;
+
+          // Generate charts
+          generateCharts(data);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Function to generate charts
+    function generateCharts(data) {
+      // Annual Overview Chart
+      const annualChartCtx = document.getElementById('annual-overview-chart').getContext('2d');
+      const annualChart = new Chart(annualChartCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          datasets: [{
+            label: 'Annual Overview',
+            data: data.annualOverviewData, // Data from the API
+            backgroundColor: '#0077b6',
+            borderColor: '#005f87',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // Initial load when page is ready
+    loadDashboard();
+  </script>
+
+</body>
+</html>

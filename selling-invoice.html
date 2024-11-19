@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 36px;
+            margin-bottom: 5px;
+            text-decoration: underline;
+            flex-grow: 1;
+            text-align: left;
+        }
+        .invoice-number-date {
+            text-align: left;
+            font-size: 12px;
+        }
+        .invoice-number {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .invoice-date {
+            font-size: 14px;
+        }
+        .business-info-box {
+            background-color: #ecf0f1;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .business-info-box p {
+            margin: 5px 0;
+        }
+        .customer-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .customer-info .left {
+            width: 45%;
+        }
+        .customer-info input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        .checkbox-container {
+            margin-top: 10px;
+        }
+        .invoice-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .invoice-details th, .invoice-details td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .invoice-details th {
+            background-color: #2980b9;
+            color: white;
+        }
+        .invoice-details input, .invoice-details select {
+            width: 100%;
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .sn {
+            width: 50px; /* Reduced width for SN */
+        }
+        .product-name {
+            width: 250px; /* Increased width for product name */
+        }
+        .quantity, .selling-price, .discount {
+            width: 100px; /* Reduced size for quantity, selling price, and discount */
+        }
+        .total {
+            width: 150px; /* Medium size for total */
+        }
+        .totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .totals p {
+            margin-right: 20px;
+            font-size: 18px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #1abc9c;
+        }
+        .action-buttons {
+            text-align: center;
+        }
+        .customer-info .left {
+            margin-top: 10px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .invoice-details th, .invoice-details td {
+                padding: 8px;
+                font-size: 12px;
+            }
+            .customer-info {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .totals p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Invoice Title with Invoice Number and Date aligned right -->
+    <div class="header">
+        <h1>Invoice</h1>
+        <div class="invoice-number-date">
+            <h3 class="invoice-number">Invoice Number: <span id="invoiceNumber"></span></h3>
+            <p class="invoice-date">Date: <input type="date" value="2024-11-16" /></p>
+        </div>
+    </div>
+
+    <!-- RR Enterprise Box (below the Invoice title) -->
+    <div class="business-info-box">
+        <p><strong>RR Enterprise</strong></p>
+        <p>Jagannathpur, Beliator, Bankura - 722203</p>
+        <p>Phone: 7001989922</p>
+        <p>Email: 100rrenterprise@gmail.com</p>
+    </div>
+
+    <!-- Customer Details Box (Below Business Info) -->
+    <div class="customer-info">
+        <div class="left">
+            <p><strong>Customer Details:</strong></p>
+            <input type="text" id="customerName" placeholder="Customer Name">
+            <input type="text" id="customerPhone" placeholder="Customer Phone">
+            <input type="text" id="billingAddress" placeholder="Billing Address">
+        </div>
+        <div class="right">
+            <p><strong>Shipping Address:</strong></p>
+            <input type="text" id="shippingAddress" placeholder="Shipping Address">
+            <div class="checkbox-container">
+                <label for="sameAddress">
+                    <input type="checkbox" id="sameAddress"> Shipping Address is Same as Billing
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Entry -->
+    <table class="invoice-details">
+        <thead>
+            <tr>
+                <th class="sn">SN.</th>
+                <th class="product-name">Product</th>
+                <th class="quantity">Quantity</th>
+                <th class="selling-price">Selling Price</th>
+                <th class="discount">Discount (%)</th>
+                <th class="total">Total</th>
+            </tr>
+        </thead>
+        <tbody id="productTable">
+            <!-- Dynamic Product Rows will go here -->
+        </tbody>
+    </table>
+    <button onclick="addProduct()">Add Product</button>
+
+    <div class="totals">
+        <p><strong>Subtotal:</strong> ₹<span id="subtotal">0.00</span></p>
+        <p><strong>Grand Total:</strong> ₹<span id="grandTotal">0.00</span></p>
+    </div>
+
+    <div class="footer">
+        <p>"Empowering Your Business with Seamless Inventory Management"</p>
+    </div>
+
+    <div class="action-buttons">
+        <button onclick="submitInvoice()">Submit</button>
+        <button onclick="printInvoice()">Print/Download</button>
+    </div>
+</div>
+
+<script>
+    // Generate a random invoice number
+    document.getElementById("invoiceNumber").textContent = "INV" + Math.floor(Math.random() * 1000000);
+
+    // Function to add a product to the table
+    async function addProduct() {
+        const productTable = document.getElementById('productTable');
+        
+        // Fetch product details from an API based on a sample product ID or code
+        const productId = prompt("Enter Product ID or Code:");
+
+        if (!productId) {
+            alert("Please provide a Product ID.");
+            return;
+        }
+
+        try {
+            const response = await fetch(https://api.example.com/products/${productId}); // Replace with your API URL
+            const product = await response.json();
+
+            const rowCount = productTable.rows.length + 1;
+
+            // Add a new row to the product table with fetched product details
+            const row = `
+                <tr>
+                    <td class="sn">${rowCount}</td>
+                    <td class="product-name"><input type="text" value="${product.name}" readonly /></td>
+                    <td class="quantity"><input type="number" min="1" value="1" oninput="calculateTotals()" /></td>
+                    <td class="selling-price"><input type="number" min="0" value="${product.sellingPrice}" oninput="calculateTotals()" /></td>
+                    <td class="discount"><input type="number" min="0" value="0" oninput="calculateTotals()" /></td>
+                    <td class="total"><input type="text" value="0" readonly /></td>
+                </tr>
+            `;
+            productTable.innerHTML += row;
+
+            // Recalculate totals
+            calculateTotals();
+        } catch (error) {
+            alert("Product not found.");
+        }
+    }
+
+    // Function to calculate total, subtotal, and grand total
+    function calculateTotals() {
+        let subtotal = 0;
+        const rows = document.querySelectorAll('#productTable

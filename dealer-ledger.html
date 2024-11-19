@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dealer Ledger - RR Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .header {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            text-align: center;
+            padding: 10px;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .actions button {
+            padding: 5px 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .actions button:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Dealer Ledger - RR Enterprise
+    </div>
+
+    <div class="container">
+        <h2>Add New Dealer</h2>
+        <div class="form-group">
+            <label for="dealerName">Dealer Name</label>
+            <input type="text" id="dealerName" placeholder="Enter dealer name">
+        </div>
+        <div class="form-group">
+            <label for="dealerPhone">Phone Number</label>
+            <input type="text" id="dealerPhone" placeholder="Enter phone number">
+        </div>
+        <div class="form-group">
+            <label for="dealerAddress">Address</label>
+            <input type="text" id="dealerAddress" placeholder="Enter address">
+        </div>
+        <div class="form-group">
+            <label for="dealerBankAccount">Bank Account Number</label>
+            <input type="text" id="dealerBankAccount" placeholder="Enter account number">
+        </div>
+        <div class="form-group">
+            <label for="dealerIFSC">Bank IFSC Code</label>
+            <input type="text" id="dealerIFSC" placeholder="Enter IFSC code">
+        </div>
+        <button class="btn" onclick="addDealer()">Add Dealer</button>
+
+        <h2>Dealer List</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Dealer Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Account Number</th>
+                    <th>IFSC Code</th>
+                    <th>Total Due</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="dealerTable">
+                <!-- Data will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const dealerList = [];
+
+        function addDealer() {
+            const name = document.getElementById('dealerName').value;
+            const phone = document.getElementById('dealerPhone').value;
+            const address = document.getElementById('dealerAddress').value;
+            const bankAccount = document.getElementById('dealerBankAccount').value;
+            const ifsc = document.getElementById('dealerIFSC').value;
+
+            if (!name || !phone || !address || !bankAccount || !ifsc) {
+                alert("All fields are required!");
+                return;
+            }
+
+            const dealer = { name, phone, address, bankAccount, ifsc, totalDue: 0 };
+            dealerList.push(dealer);
+
+            document.getElementById('dealerName').value = '';
+            document.getElementById('dealerPhone').value = '';
+            document.getElementById('dealerAddress').value = '';
+            document.getElementById('dealerBankAccount').value = '';
+            document.getElementById('dealerIFSC').value = '';
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('dealerTable');
+            tableBody.innerHTML = '';
+
+            dealerList.forEach((dealer, index) => {
+                const row = `
+                    <tr>
+                        <td>${dealer.name}</td>
+                        <td>${dealer.phone}</td>
+                        <td>${dealer.address}</td>
+                        <td>${dealer.bankAccount}</td>
+                        <td>${dealer.ifsc}</td>
+                        <td>₹${dealer.totalDue}</td>
+                        <td class="actions">
+                            <button onclick="viewDetails(${index})">Details</button>
+                            <button onclick="makePayment(${index})">Pay</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        function viewDetails(index) {
+            const dealer = dealerList[index];
+            alert(Details for ${dealer.name}\nPhone: ${dealer.phone}\nAddress: ${dealer.address}\nBank Account: ${dealer.bankAccount}\nIFSC: ${dealer.ifsc}\nTotal Due: ₹${dealer.totalDue});
+        }
+
+        function makePayment(index) {
+            const amount = prompt("Enter amount to pay:");
+            if (!amount || isNaN(amount) || amount <= 0) {
+                alert("Invalid amount!");
+                return;
+            }
+            dealerList[index].totalDue -= parseFloat(amount);
+            alert(Payment of ₹${amount} made for ${dealerList[index].name});
+            renderTable();
+        }
+    </script>
+</body>
+</html>

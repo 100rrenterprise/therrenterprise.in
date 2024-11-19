@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RR Enterprise Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+
+    /* Sidebar Styling */
+.sidebar {
+  width: 250px;
+  background: linear-gradient(135deg, #0077b6, #2a9d8f); /* Ocean Blue to Ocean Green gradient */
+  color: white;
+  height: 100vh; /* Full height */
+  position: fixed;
+  overflow-y: auto; /* Enable scrolling */
+  padding-top: 20px;
+}
+
+    .sidebar .logo {
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar ul li {
+      padding: 10px 15px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .sidebar ul li a {
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+
+    .sidebar ul li:hover {
+      background-color: #005f87;
+    }
+
+    .sidebar ul li .dropdown {
+      display: none;
+      list-style-type: none;
+      padding-left: 20px;
+    }
+
+    .sidebar ul li.active .dropdown {
+      display: block;
+    }
+
+    .sidebar ul li .arrow {
+      position: absolute;
+      right: 15px;
+      transition: transform 0.3s;
+    }
+
+    .sidebar ul li.active .arrow {
+      transform: rotate(90deg);
+    }
+
+    /* Main Content Styling */
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      flex: 1;
+      overflow: auto;
+    }
+
+    /* Responsive Sidebar for Smaller Screens */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+      }
+
+      .main-content {
+        margin-left: 70px;
+      }
+
+      .sidebar .logo,
+      .sidebar ul li span {
+        display: none;
+      }
+
+      .sidebar ul li a {
+        text-align: center;
+      }
+    }
+
+    /* WhatsApp Button Styling */
+    .whatsapp-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25D366;
+      color: white;
+      border-radius: 50%;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-size: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .whatsapp-btn:hover {
+      background-color: #128C7E;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">RR Enterprise</div>
+    <ul>
+      <li><a href="dashboard.html" target="_blank">📊 Dashboard</a></li>
+      <li class="menu-item">
+        <span>📦 Items</span> <span class="arrow">▶</span>
+        <ul class="dropdown">
+          <li><a href="all-items.html" target="_blank">All Items</a></li>
+          <li><a href="add-item.html" target="_blank">Add New Item</a></li>
+          <li><a href="edit-item.html" target="_blank">Edit Item</a></li>
+          <li><a href="delete-item.html" target="_blank">Delete Item</a></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        <span>💵 Selling</span> <span class="arrow">▶</span>
+        <ul class="dropdown">
+          <li><a href="selling-invoice.html" target="_blank">Selling Invoice</a></li>
+          <li><a href="selling-order.html" target="_blank">Selling Order</a></li>
+              </ul>
+      </li>
+      <li class="menu-item">
+        <span>🛒 Purchase</span> <span class="arrow">▶</span>
+        <ul class="dropdown">
+          <li><a href="purchase-order.html" target="_blank">Purchase Order</a></li>
+          <li><a href="purchase-entry.html" target="_blank">Purchase Entry</a></li>
+          <li><a href="bulk-entry.html" target="_blank">Bulk Entry</a></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        <span>📘 Customer Ledger</span> <span class="arrow">▶</span>
+        <ul class="dropdown">
+          <li><a href="customer-name-entry.html" target="_blank">Customer Name Entry </a></li>
+          <li><a href="payments-invoices.html" target="_blank">Payments Linked with Invoices</a></li>
+          <li><a href="overdue-list.html" target="_blank">Overdue List</a></li>
+          <li><a href="overdue-account.html" target="_blank">Overdue Account</a></li>
+        </ul>
+      </li>
+      <li><a href="dealer-ledger.html" target="_blank">📋 Dealer Ledger</a></li>
+      <li><a href="banking.html" target="_blank">🏦 Banking</a></li>
+      <li><a href="report.html" target="_blank">📈 Report</a></li>
+       
+      </li>
+      <li><a href="complaints.html" target="_blank">✉ Complaint Section</a></li>
+      <li><a href="about-us.html" target="_blank">ℹ About Us</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Welcome to RR Enterprise</h1>
+    <p id="content-area">This is your complete dashboard for managing inventory, sales, purchases, and reports.</p>
+  </div>
+
+  <!-- WhatsApp Button -->
+  <a href="https://wa.me/7001989922" class="whatsapp-btn" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <script>
+    // JavaScript to handle dropdowns and content change
+    document.querySelectorAll('.menu-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        this.classList.toggle('active');
+      });
+    });
+
+    function changeContent(section) {
+      document.getElementById('content-area').innerHTML = 'You are viewing: ' + section;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Entry - RR Enterprise</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+    }
+    
+    /* Header Styles */
+    header {
+      background-color: #006e87;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    /* Container for form */
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      font-size: 22px;
+      margin-bottom: 15px;
+    }
+
+    /* Form styles */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    /* Preview Section */
+    #preview {
+      margin-top: 30px;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    #preview pre {
+      font-size: 14px;
+      color: #333;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .footer {
+      background-color: #006e87;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    Bulk Purchase Entry - RR Enterprise
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h2>Upload Purchase Entry Image</h2>
+
+    <!-- Form for Upload -->
+    <form id="uploadForm" onsubmit="event.preventDefault(); processImage();">
+      <input type="file" id="imageUpload" accept="image/*" />
+      <button type="submit">Upload Image</button>
+    </form>
+
+    <!-- Preview Section -->
+    <div id="preview"></div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    © 2024 RR Enterprise. All rights reserved.
+  </div>
+
+  <script>
+    function processImage() {
+      const file = document.getElementById('imageUpload').files[0];
+
+      // Send the file to the backend (using AJAX or Fetch API)
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('/process-image', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Preview the extracted data
+        displayPreview(data);
+      })
+      .catch(error => console.error('Error processing image:', error));
+    }
+
+    function displayPreview(data) {
+      const previewDiv = document.getElementById('preview');
+      previewDiv.innerHTML = <pre>${JSON.stringify(data, null, 2)}</pre>;  // Show extracted data in a preview
+      // You can create a table here for a cleaner display of the previewed data
+    }
+  </script>
+</body>
+</html>

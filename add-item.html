@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Item</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js"></script>
+
+  <!-- CSS -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eaf4eb; /* Lighter Green */
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2d6a4f;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      width: 48%; /* Two fields in one row */
+    }
+
+    .form-group label {
+      width: 40%;
+      font-weight: bold;
+      color: #2d6a4f;
+    }
+
+    .form-group input {
+      width: 60%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .form-group span {
+      width: 60%;
+      padding: 8px;
+      font-weight: bold;
+      color: #2d6a4f;
+    }
+
+    #totalValue {
+      font-size: 20px;
+      color: #2d6a4f;
+      text-align: right;
+      margin-top: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px 20px;
+      background-color: #2d6a4f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #1b4332;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Add New Item</h1>
+    <form id="addItemForm">
+      <!-- Item Name -->
+      <div class="form-group">
+        <label for="itemName">Item Name:</label>
+        <input type="text" id="itemName" placeholder="Enter item name" required tabindex="1">
+      </div>
+
+      <!-- Buying Price -->
+      <div class="form-group">
+        <label for="buyingPrice">Buying Price:</label>
+        <input type="number" id="buyingPrice" placeholder="Enter buying price" required tabindex="2">
+      </div>
+
+      <!-- Selling Price -->
+      <div class="form-group">
+        <label for="sellingPrice">Selling Price:</label>
+        <input type="number" id="sellingPrice" placeholder="Enter selling price" required tabindex="3">
+      </div>
+
+      <!-- Current Stock -->
+      <div class="form-group">
+        <label for="currentStock">Current Stock:</label>
+        <input type="number" id="currentStock" placeholder="Enter current stock" required tabindex="4">
+      </div>
+
+      <!-- Total Value Display -->
+      <div id="totalValue">
+        Total Value: ₹0
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" tabindex="5">Add Item</button>
+    </form>
+  </div>
+
+  <!-- Firebase Script -->
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      databaseURL: "YOUR_DATABASE_URL",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database(app);
+
+    // Function to update Total Value
+    function updateTotalValue() {
+      const buyingPrice = parseFloat(document.getElementById('buyingPrice').value);
+      const currentStock = parseInt(document.getElementById('currentStock').value, 10);
+      const totalValue = buyingPrice * currentStock;
+      document.getElementById('totalValue').innerText = Total Value: ₹${totalValue.toFixed(2)};
+    }
+
+    // Event listener for buying price and current stock to update total value
+    document.getElementById('buyingPrice').addEventListener('input', updateTotalValue);
+    document.getElementById('currentStock').addEventListener('input', updateTotalValue);
+
+    // Add Item Form Submission
+    const form = document.getElementById('addItemForm');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const itemName = document.getElementById('itemName').value;
+      const buyingPrice = parseFloat(document.getElementById('buyingPrice').value);
+      const sellingPrice = parseFloat(document.getElementById('sellingPrice').value);
+      const currentStock = parseInt(document.getElementById('currentStock').value, 10);
+      const totalValue = buyingPrice * currentStock;
+
+      // Push Data to Firebase
+      const itemRef = db.ref('inventoryItems').push();
+      itemRef.set({
+        itemName: itemName,
+        buyingPrice: buyingPrice,
+        sellingPrice: sellingPrice,
+        currentStock: currentStock,
+        totalValue: totalValue
+      });
+
+      alert('Item added successfully!');
+      form.reset();
+      document.getElementById('totalValue').innerText = 'Total Value: ₹0';
+    });
+  </script>
+</body>
+</html>

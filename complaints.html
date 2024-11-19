@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints Section - RR Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fa;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            color: white;
+            text-align: center;
+            padding: 25px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 120px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .status {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .status.pending {
+            color: orange;
+        }
+
+        .status.accepted {
+            color: green;
+        }
+
+        .status.rejected {
+            color: red;
+        }
+
+        .complaint-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .complaint-card h4 {
+            margin-bottom: 10px;
+        }
+
+        .complaint-card p {
+            font-size: 14px;
+        }
+
+        .complaint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .complaint-list .complaint-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #e7f1ff;
+            border-radius: 6px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .complaint-item button {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+
+        .complaint-item button:hover {
+            background: #218838;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px 0;
+            background: #f1f1f1;
+            color: #333;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        Complaint Section - RR Enterprise
+    </div>
+
+    <div class="container">
+        <h2>Submit Your Complaint</h2>
+
+        <div class="form-group">
+            <label for="customerName">Customer Name:</label>
+            <input type="text" id="customerName" placeholder="Enter your name" />
+        </div>
+
+        <div class="form-group">
+            <label for="complaintDetails">Complaint Details:</label>
+            <textarea id="complaintDetails" placeholder="Describe your issue here"></textarea>
+        </div>
+
+        <div class="form-group">
+            <button class="btn" onclick="submitComplaint()">Submit Complaint</button>
+        </div>
+
+        <h2>Check Complaint Status</h2>
+        <div class="form-group">
+            <label for="complaintId">Your Complaint ID:</label>
+            <select id="complaintId" onchange="checkStatus()">
+                <option value="">Select Complaint ID</option>
+                <!-- Complaint IDs will be populated here -->
+            </select>
+        </div>
+
+        <div class="form-group">
+            <div id="statusMessage" class="status"></div>
+        </div>
+
+        <div class="complaint-list">
+            <h2>Complaints List</h2>
+            <!-- Complaint list will be shown here dynamically -->
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 RR Enterprise | All rights reserved</p>
+    </div>
+
+    <script>
+        const complaints = [];
+        let complaintCounter = 1;
+
+        // Function to submit a complaint
+        function submitComplaint() {
+            const name = document.getElementById("customerName").value;
+            const details = document.getElementById("complaintDetails").value;
+            if (name && details) {
+                const complaint = {
+                    id: complaintCounter++,
+                    name: name,
+                    details: details,
+                    status: 'Pending'
+                };
+                complaints.push(complaint);
+                updateComplaintList();
+                populateComplaintIds(); // Re-populate the dropdown of complaint IDs
+                alert('Your complaint has been submitted!');
+                clearFields();
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        // Function to update complaint list dynamically
+        function updateComplaintList() {
+            const complaintList = document.querySelector(".complaint-list");
+            complaintList.innerHTML = ''; // Clear existing list
+            complaints.forEach((complaint) => {
+                const div = document.createElement("div");
+                div.classList.add("complaint-item");
+                div.innerHTML = `
+                    <div>
+                        <strong>${complaint.name}</strong><br />
+                        <small>${complaint.details}</small><br />
+                        <span class="status ${getStatusClass(complaint.status)}">${complaint.status}</span>
+                    </div>
+                    <button onclick="changeStatus(${complaint.id})">Change Status</button>
+                `;
+                complaintList.appendChild(div);
+            });
+        }
+
+        // Function to check the status of a complaint by ID
+        function checkStatus() {
+            const complaintId = document.getElementById("complaintId").value;
+            const statusMessage = document.getElementById("statusMessage");
+            const complaint = complaints.find(c => c.id == complaintId);
+            if (complaint) {
+                statusMessage.textContent = Your complaint status is: ${complaint.status};
+                statusMessage.classList.add(getStatusClass(complaint.status));
+            } else {
+                statusMessage.textContent = "No complaint found with this ID.";
+                statusMessage.classList.remove('accepted', 'rejected', 'pending');
+            }
+        }
+
+        // Function to change complaint status (Admin feature)
+        function changeStatus(complaintId) {
+            const status = prompt("Enter new status (Accepted/Rejected):");
+            if (status) {
+                const complaint = complaints.find(c => c.id == complaintId);
+                if (complaint) {
+                    complaint.status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+                    updateComplaintList();
+                    populateComplaintIds(); // Re-populate the dropdown of complaint IDs
+                }
+            }
+        }
+
+        // Function to return the appropriate class for complaint status
+        function getStatusClass(status) {
+            if (status === 'Accepted') return 'accepted';
+            if (status === 'Rejected') return 'rejected';
+            return 'pending';
+        }
+
+        // Function to populate complaint ID dropdown dynamically
+        function populateComplaintIds() {
+            const complaintIdSelect = document.getElementById("complaintId");
+            complaintIdSelect.innerHTML = '<option value="">Select Complaint ID</option>';
+            complaints.forEach(complaint => {
+                const option = document.createElement("option");
+                option.value = complaint

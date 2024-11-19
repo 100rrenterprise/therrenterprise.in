@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overdue List - RR Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(90deg, #FF5722, #E64A19);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .btn {
+            padding: 8px 12px;
+            background: #FF5722;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #E64A19;
+        }
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+        .manual-btn {
+            margin: 10px 0;
+            background: #4CAF50;
+            border: none;
+            padding: 8px 16px;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .manual-btn:hover {
+            background: #388E3C;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Overdue List - RR Enterprise
+    </div>
+    <div class="container">
+        <h2>Overdue Customers</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Customer Name</th>
+                    <th>Phone Number</th>
+                    <th>Overdue Amount (₹)</th>
+                    <th>Last Reminder</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="overdueList">
+                <!-- Overdue data will be added dynamically -->
+            </tbody>
+        </table>
+        <button class="manual-btn" onclick="sendManualReminders()">Send Manual Reminders to All</button>
+    </div>
+
+    <script>
+        // Example overdue data
+        const overdueCustomers = [
+            { id: 1, name: "John Doe", phone: "9876543210", amount: 500, lastReminder: "2024-11-14" },
+            { id: 2, name: "Jane Smith", phone: "9123456789", amount: 1200, lastReminder: "2024-11-12" },
+        ];
+
+        // Render overdue data in table
+        const overdueList = document.getElementById('overdueList');
+        overdueCustomers.forEach((customer, index) => {
+            overdueList.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${customer.name}</td>
+                    <td>${customer.phone}</td>
+                    <td>₹${customer.amount.toFixed(2)}</td>
+                    <td>${customer.lastReminder}</td>
+                    <td>
+                        <button class="btn btn-small" onclick="sendWhatsApp(${customer.id})">Send WhatsApp</button>
+                        <button class="btn btn-small" onclick="sendSMS(${customer.id})">Send SMS</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        // Function to send WhatsApp message
+        function sendWhatsApp(customerId) {
+            const customer = overdueCustomers.find(c => c.id === customerId);
+            const paymentLink = https://pay.example.com?amount=${customer.amount}&name=${encodeURIComponent(customer.name)};
+            const message = Hello ${customer.name}, your overdue amount is ₹${customer.amount}. Please pay using this link: ${paymentLink};
+            const whatsappURL = https://wa.me/${customer.phone}?text=${encodeURIComponent(message)};
+            window.open(whatsappURL, '_blank');
+        }
+
+        // Function to send SMS
+        function sendSMS(customerId) {
+            const customer = overdueCustomers.find(c => c.id === customerId);
+            const paymentLink = https://pay.example.com?amount=${customer.amount}&name=${encodeURIComponent(customer.name)};
+            const message = Hello ${customer.name}, your overdue amount is ₹${customer.amount}. Please pay using this link: ${paymentLink};
+
+            // Use SMS API (e.g., Twilio, Fast2SMS)
+            fetch('https://api.smsprovider.com/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phone: customer.phone,
+                    message: message
+                })
+            }).then(response => {
+                if (response.ok) {
+                    alert(SMS sent to ${customer.phone});
+                } else {
+                    alert(Failed to send SMS to ${customer.phone});
+                }
+            }).catch(err => console.error('SMS API Error:', err));
+        }
+
+        // Function to send manual reminders to all
+        function sendManualReminders() {
+            overdueCustomers.forEach(customer => {
+                sendWhatsApp(customer.id);
+                sendSMS(customer.id);
+            });
+            alert("Manual reminders sent to all overdue customers.");
+        }
+
+        // Automatic reminders using setInterval
+        function sendAutomaticReminders() {
+            overdueCustomers.forEach(customer => {
+                sendWhatsApp(customer.id);
+                sendSMS(customer.id);
+            });
+            console.log("Automatic reminders sent at: " + new Date().toLocaleString());
+        }
+
+        // Schedule reminders every week (3 days)
+        const daysToRemind = [1, 3, 5]; // Monday, Wednesday, Friday
+        setInterval(() => {
+            const today = new Date().getDay();
+            if (daysToRemind.includes(today)) {
+                sendAutomaticReminders();
+            }
+        }, 24 * 60 * 60 * 1000); // Check daily
+    </script>
+</body>
+</html>

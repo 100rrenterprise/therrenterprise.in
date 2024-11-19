@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - RR Enterprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .download-options {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .download-options button {
+            font-size: 14px;
+            padding: 12px 30px;
+            margin: 0 10px;
+        }
+
+        .reports-menu {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .reports-menu a {
+            font-size: 16px;
+            text-decoration: none;
+            padding: 12px 20px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 4px;
+            text-align: center;
+            width: 150px;
+        }
+
+        .reports-menu a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        Reports - RR Enterprise
+    </div>
+
+    <div class="container">
+        <h2>Generate Reports</h2>
+        
+        <!-- Reports menu links -->
+        <div class="reports-menu">
+            <a href="#" onclick="generateReport('selling')">Date-wise Selling Reports</a>
+            <a href="#" onclick="generateReport('purchase')">Purchase Entry Reports</a>
+            <a href="#" onclick="generateReport('dealer')">Total Purchase by Dealer</a>
+            <a href="#" onclick="generateReport('customer')">Customer-wise Selling Reports</a>
+            <a href="#" onclick="generateReport('annual')">Annual Total Purchase and Sales</a>
+            <a href="#" onclick="generateReport('profit')">Profit Information</a>
+        </div>
+
+        <div class="table-container">
+            <table id="reportTable">
+                <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Amount Due</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated by JS -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="download-options">
+            <button class="btn" onclick="downloadPDF()">Download as PDF</button>
+            <button class="btn" onclick="downloadExcel()">Download as Excel</button>
+        </div>
+    </div>
+
+    <script>
+        // Fetch report data from API (simulate with dummy data here)
+        function fetchReportData(type) {
+            switch(type) {
+                case 'selling':
+                    return [
+                        { invoice: 'INV001', amountDue: '1000', dueDate: '2024-11-30', status: 'Unpaid' },
+                        { invoice: 'INV002', amountDue: '500', dueDate: '2024-11-20', status: 'Paid' }
+                    ];
+                case 'purchase':
+                    return [
+                        { invoice: 'INV003', amountDue: '3000', dueDate: '2024-11-15', status: 'Unpaid' },
+                        { invoice: 'INV004', amountDue: '2000', dueDate: '2024-11-18', status: 'Paid' }
+                    ];
+                // Add other case handling for dealer, customer, etc.
+                default:
+                    return [];
+            }
+        }
+
+        // Populate table with report data
+        function generateReport(type) {
+            const reportData = fetchReportData(type);
+            const tableBody = document.getElementById('reportTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            reportData.forEach(report => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${report.invoice}</td>
+                    <td>₹${report.amountDue}</td>
+                    <td>${report.dueDate}</td>
+                    <td>${report.status}</td>
+                    <td><button class="btn" onclick="viewDetails('${report.invoice}')">View</button></td>
+                `;
+            });
+        }
+
+        // Function to handle downloading the report as PDF
+        function downloadPDF() {
+            const doc = new jsPDF();
+            doc.autoTable({ html: '#reportTable' });
+            doc.save('report.pdf');
+        }
+
+        // Function to handle downloading the report as Excel
+        function downloadExcel() {
+            const table = document.getElementById('reportTable');
+            const wb = XLSX.utils.table_to_book(table, { sheet: 'Report' });
+            XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+            saveAs(new Blob([s2ab(XLSX.write(wb, { bookType: 'xlsx', type: 'binary' }))], { type: 'application/octet-stream' }), 'report.xlsx');
+        }
+
+        // Function to convert binary data
+        function s2ab(s) {
+            const buf = new ArrayBuffer(s.length);
+            const view = new Uint8Array(buf);
+            for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+        }
+
+        // Call to populate the table with data on page load
+        window.onload = generateReport('selling'); // Default report
+    </script>
+
+    <!-- Libraries for Excel and PDF download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</body>
+</html>

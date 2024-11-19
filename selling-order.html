@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 36px;
+        }
+        .order-form input,
+        .order-form select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .order-table th, .order-table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .order-table th {
+            background-color: #2980b9;
+            color: white;
+        }
+        .order-table td input {
+            width: 100%;
+            padding: 5px;
+            font-size: 14px;
+        }
+        .order-table td:nth-child(2) input {
+            width: 98%;
+        }
+        .order-table td:nth-child(3) input,
+        .order-table td:nth-child(4) input,
+        .order-table td:nth-child(5) input {
+            width: 30%;
+        }
+        .totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .totals p {
+            margin-right: 20px;
+            font-size: 18px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #1abc9c;
+        }
+        .submit-order {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .submit-order button {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Order Form Title -->
+    <div class="header">
+        <h1>Order Form</h1>
+    </div>
+
+    <!-- Order Form Fields -->
+    <div class="order-form">
+        <input type="text" id="customerName" placeholder="Customer Name">
+        <input type="text" id="customerPhone" placeholder="Customer Phone">
+        <input type="text" id="billingAddress" placeholder="Billing Address">
+    </div>
+
+    <!-- Product Table -->
+    <table class="order-table">
+        <thead>
+            <tr>
+                <th>SN.</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Selling Price</th>
+                <th>Discount</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody id="orderItems">
+            <!-- Dynamic product rows will go here -->
+        </tbody>
+    </table>
+
+    <!-- Order Totals -->
+    <div class="totals">
+        <p><strong>Subtotal:</strong> ₹<span id="subtotal">0.00</span></p>
+        <p><strong>Grand Total:</strong> ₹<span id="grandTotal">0.00</span></p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button onclick="addOrderItem()">Add Product</button>
+    </div>
+
+    <!-- Submit Order Button (Moved to bottom right) -->
+    <div class="submit-order">
+        <button onclick="submitOrder()">Submit Order</button>
+    </div>
+</div>
+
+<script>
+    let orderCount = 0;
+
+    // Function to add a product to the order table
+    function addOrderItem() {
+        const productTable = document.getElementById('orderItems');
+        const rowCount = orderCount + 1;
+
+        // Add a new row for the product
+        const row = `
+            <tr>
+                <td>${rowCount}</td>
+                <td><input type="text" placeholder="Product Name" /></td>
+                <td><input type="number" min="1" value="1" oninput="calculateOrderTotals()" /></td>
+                <td><input type="number" min="0" value="100" oninput="calculateOrderTotals()" /></td>
+                <td><input type="number" min="0" value="0" oninput="calculateOrderTotals()" /></td>
+                <td><input type="text" value="0.00" readonly /></td>
+            </tr>
+        `;
+        productTable.innerHTML += row;
+        orderCount++;
+    }
+
+    // Function to calculate total, subtotal, and grand total
+    function calculateOrderTotals() {
+        let subtotal = 0;
+        const rows = document.querySelectorAll('#orderItems tr');
+        rows.forEach(row => {
+            const quantity = parseFloat(row.querySelector('td:nth-child(3) input').value);
+            const price = parseFloat(row.querySelector('td:nth-child(4) input').value);
+            const discount = parseFloat(row.querySelector('td:nth-child(5) input').value);
+            const total = (quantity * price) - ((discount / 100) * (quantity * price));
+            row.querySelector('td:nth-child(6) input').value = total.toFixed(2);
+            subtotal += total;
+        });
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+        document.getElementById('grandTotal').textContent = subtotal.toFixed(2);
+    }
+
+    // Function to submit the order (save as draft)
+    function submitOrder() {
+        const orderDetails = {
+            customerName: document.getElementById('customerName').value,
+            customerPhone: document.getElementById('customerPhone').value,
+            billingAddress: document.getElementById('billingAddress').value,
+            items: []
+        };
+
+        const rows = document.querySelectorAll('#orderItems tr');
+        rows.forEach(row => {
+            const item = {
+                productName: row.querySelector('td:nth-child(2) input').value,
+                quantity: row.querySelector('td:nth-child(3) input').value,
+                price: row.querySelector('td:nth-child(4) input').value,
+                discount: row.querySelector('td:nth-child(5) input').value,
+                total: row.querySelector('td:nth-child(6) input').value
+            };
+            orderDetails.items.push(item);
+        });
+
+        // Here you would send the data to the server (as a draft)
+        console.log('Order Draft:', orderDetails);
+        alert('Order submitted as draft.');
+    }
+</script>
+
+</body>
+</html>

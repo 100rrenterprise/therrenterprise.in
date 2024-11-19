@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Entry - RR Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f8fc;
+        }
+        .header {
+            background: linear-gradient(90deg, #4CAF50, #2E7D32);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background: #2E7D32;
+        }
+        .customer-list {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .alert {
+            margin-top: 15px;
+            color: red;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Customer Entry - RR Enterprise
+    </div>
+
+    <div class="container">
+        <h1>Add New Customer</h1>
+        <div class="form-group">
+            <label for="customerName">Customer Name</label>
+            <input type="text" id="customerName" placeholder="Enter customer name">
+        </div>
+        <div class="form-group">
+            <label for="customerPhone">Customer Phone</label>
+            <input type="text" id="customerPhone" placeholder="Enter phone number">
+        </div>
+        <div class="form-group">
+            <label for="customerAddress">Customer Address</label>
+            <input type="text" id="customerAddress" placeholder="Enter address">
+        </div>
+        <div class="form-group">
+            <label for="customerAdvance">Advance Amount (₹)</label>
+            <input type="number" id="customerAdvance" placeholder="Enter advance amount">
+        </div>
+        <div class="form-group">
+            <label for="customerDue">Due Amount (₹)</label>
+            <input type="number" id="customerDue" placeholder="Enter due amount">
+        </div>
+        <button class="btn" onclick="addCustomer()">Add Customer</button>
+        <div class="alert" id="alertMessage"></div>
+
+        <div class="customer-list">
+            <h2>Customer List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Name</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Advance (₹)</th>
+                        <th>Due (₹)</th>
+                    </tr>
+                </thead>
+                <tbody id="customerTable">
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const customerTable = document.getElementById("customerTable");
+
+        function addCustomer() {
+            const name = document.getElementById("customerName").value;
+            const phone = document.getElementById("customerPhone").value;
+            const address = document.getElementById("customerAddress").value;
+            const advance = document.getElementById("customerAdvance").value;
+            const due = document.getElementById("customerDue").value;
+
+            if (!name || !phone || !address || !advance || !due) {
+                showAlert("All fields are required!");
+                return;
+            }
+
+            const row = customerTable.insertRow();
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${phone}</td>
+                <td>${address}</td>
+                <td>₹${advance}</td>
+                <td>₹${due}</td>
+            `;
+
+            // Clear inputs
+            document.getElementById("customerName").value = "";
+            document.getElementById("customerPhone").value = "";
+            document.getElementById("customerAddress").value = "";
+            document.getElementById("customerAdvance").value = "";
+            document.getElementById("customerDue").value = "";
+        }
+
+        function showAlert(message) {
+            const alert = document.getElementById("alertMessage");
+            alert.textContent = message;
+            alert.style.display = "block";
+            setTimeout(() => {
+                alert.style.display = "none";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Entry - RR Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .header {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .header-left {
+            float: left;
+            padding-left: 20px;
+        }
+        .header-center {
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 95%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .btn {
+            padding: 5px 10px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .submit-btn {
+            background-color: #28a745;
+        }
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+        input[name="productName[]"] {
+            font-size: 18px; /* Increase font size for product name */
+        }
+        .serialNumber {
+            font-size: 16px; /* Adjust serial number font size */
+        }
+    </style>
+    <script>
+        let serialNumber = 1;
+
+        function addProductRow() {
+            const table = document.getElementById('productTable');
+            const row = table.insertRow(-1);
+            row.innerHTML = `
+                <td class="serialNumber">${serialNumber++}</td>
+                <td><input type="text" name="productName[]" placeholder="Enter Product Name" required></td>
+                <td><input type="number" name="quantity[]" oninput="calculateRowTotal(this)" placeholder="Qty" min="1" required></td>
+                <td><input type="number" name="purchasePrice[]" oninput="calculateRowTotal(this)" placeholder="Price" min="0" required></td>
+                <td class="rowTotal">0.00</td>
+                <td><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td>
+            `;
+        }
+
+        function calculateRowTotal(input) {
+            const row = input.closest('tr');
+            const qty = row.querySelector('[name="quantity[]"]').value || 0;
+            const price = row.querySelector('[name="purchasePrice[]"]').value || 0;
+            const rowTotal = parseFloat(qty) * parseFloat(price);
+            row.querySelector('.rowTotal').textContent = rowTotal.toFixed(2);
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            const rows = document.querySelectorAll('#productTable .rowTotal');
+            rows.forEach(row => {
+                total += parseFloat(row.textContent);
+            });
+            document.getElementById('totalValue').textContent = total.toFixed(2);
+        }
+
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+            calculateTotal();
+        }
+
+        function saveOrder() {
+            const form = document.getElementById('purchaseOrderForm');
+            const formData = new FormData(form);
+            const orderData = {};
+            formData.forEach((value, key) => {
+                if (!orderData[key]) {
+                    orderData[key] = value;
+                } else {
+                    if (!Array.isArray(orderData[key])) {
+                        orderData[key] = [orderData[key]];
+                    }
+                    orderData[key].push(value);
+                }
+            });
+            localStorage.setItem('purchaseOrder', JSON.stringify(orderData));
+            
+            alert("Order saved successfully! Redirecting to print...");
+            window.location.href = "print_order.html"; // Replace with the actual print page URL
+        }
+
+        // Listen for Enter key to add a new row only when focus is on the last row of Purchase Price
+        document.addEventListener('keydown', function(event) {
+            const lastPurchasePriceInput = document.querySelector('input[name="purchasePrice[]"]:last-child');
+            if (event.key === "Enter" && document.activeElement === lastPurchasePriceInput) {
+                addProductRow();
+            }
+        });
+
+    </script>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">RR Enterprise</div>
+        <div class="header-center">Purchase Entry</div>
+    </div>
+    <div class="container">
+        <form id="purchaseOrderForm" onsubmit="event.preventDefault(); saveOrder();">
+            <div class="form-group">
+                <label for="dealerName">Dealer Name:</label>
+                <input type="text" id="dealerName" name="dealerName" placeholder="Enter Dealer Name" required>
+            </div>
+            <div class="form-group">
+                <label for="supplierName">Supplier Name:</label>
+                <input type="text" id="supplierName" name="supplierName" placeholder="Enter Supplier Name" required>
+            </div>
+            <div class="form-group">
+                <label for="orderDate">Order Date:</label>
+                <input type="date" id="orderDate" name="orderDate" required>
+            </div>
+            <div class="form-group">
+                <label for="remarks">Remarks:</label>
+                <textarea id="remarks" name="remarks" rows="3" placeholder="Enter any remarks"></textarea>
+            </div>
+            <h2>Product Details</h2>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Serial No.</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Purchase Price</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="serialNumber">1</td>
+                        <td><input type="text" name="productName[]" placeholder="Enter Product Name" required></td>
+                        <td><input type="number" name="quantity[]" oninput="calculateRowTotal(this)" placeholder="Qty" min="1" required></td>
+                        <td><input type="number" name="purchasePrice[]" oninput="calculateRowTotal(this)" placeholder="Price" min="0" required></td>
+                        <td class="rowTotal">0.00</td>
+                        <td><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-group">
+                <p class="total">Total Purchase Value: ₹<span id="totalValue">0.00</span></p>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn submit-btn">Submit Order</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

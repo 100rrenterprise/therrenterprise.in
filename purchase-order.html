@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Purchase Order - RR Enterprise</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .header {
+            background: linear-gradient(90deg, #007BFF, #0056b3);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 95%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .submit-btn {
+            background-color: #28a745;
+        }
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+    <script>
+        // Function to handle row addition when "Enter" is pressed in the last row
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                addProductRow();
+            }
+        }
+
+        // Function to add a new product row dynamically
+        function addProductRow() {
+            const table = document.getElementById('productTable');
+            const row = table.insertRow(-1);
+            row.innerHTML = `
+                <td><input type="text" name="productName[]" placeholder="Enter Product Name"></td>
+                <td><input type="number" name="quantity[]" oninput="calculateRowTotal(this)" placeholder="Qty" min="1"></td>
+                <td><input type="number" name="purchasePrice[]" oninput="calculateRowTotal(this)" placeholder="Price" min="0"></td>
+                <td class="rowTotal">0.00</td>
+                <td><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td>
+            `;
+            const lastRow = table.rows[table.rows.length - 2];
+            const lastInput = lastRow.querySelector('input');
+            lastInput.focus();
+        }
+
+        function calculateRowTotal(input) {
+            const row = input.closest('tr');
+            const qty = row.querySelector('[name="quantity[]"]').value || 0;
+            const price = row.querySelector('[name="purchasePrice[]"]').value || 0;
+            const rowTotal = parseFloat(qty) * parseFloat(price);
+            row.querySelector('.rowTotal').textContent = rowTotal.toFixed(2);
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            const rows = document.querySelectorAll('#productTable .rowTotal');
+            rows.forEach(row => {
+                total += parseFloat(row.textContent);
+            });
+            document.getElementById('totalValue').textContent = total.toFixed(2);
+        }
+
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+            calculateTotal();
+        }
+
+        function saveOrder() {
+            // Save order data to localStorage (or send to backend)
+            const form = document.getElementById('purchaseOrderForm');
+            const formData = new FormData(form);
+            const orderData = {};
+            formData.forEach((value, key) => {
+                if (!orderData[key]) {
+                    orderData[key] = value;
+                } else {
+                    if (!Array.isArray(orderData[key])) {
+                        orderData[key] = [orderData[key]];
+                    }
+                    orderData[key].push(value);
+                }
+            });
+            localStorage.setItem('purchaseOrder', JSON.stringify(orderData));
+            
+            // Redirect to print page
+            alert("Order saved successfully! Redirecting to print...");
+            window.open("print_order.html", "_blank"); // Open print page in a new window
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        Purchase Order Form - RR Enterprise
+    </div>
+    <div class="container">
+        <form id="purchaseOrderForm" onsubmit="event.preventDefault(); saveOrder();">
+            <div class="form-group">
+                <label for="supplierName">Supplier Name:</label>
+                <input type="text" id="supplierName" name="supplierName" placeholder="Enter Supplier Name" required>
+            </div>
+            <div class="form-group">
+                <label for="orderDate">Order Date:</label>
+                <input type="date" id="orderDate" name="orderDate" required>
+            </div>
+            <div class="form-group">
+                <label for="remarks">Remarks:</label>
+                <textarea id="remarks" name="remarks" rows="3" placeholder="Enter any remarks"></textarea>
+            </div>
+            <h2>Product Details</h2>
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Purchase Price</th>
+                        <th>Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="productName[]" placeholder="Enter Product Name"></td>
+                        <td><input type="number" name="quantity[]" oninput="calculateRowTotal(this)" placeholder="Qty" min="1" onkeydown="handleEnterKey(event)"></td>
+                        <td><input type="number" name="purchasePrice[]" oninput="calculateRowTotal(this)" placeholder="Price" min="0" onkeydown="handleEnterKey(event)"></td>
+                        <td class="rowTotal">0.00</td>
+                        <td><button type="button" class="btn" onclick="removeRow(this)">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-group">
+                <p class="total">Total Purchase Value: ₹<span id="totalValue">0.00</span></p>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn submit-btn">Submit Order</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
